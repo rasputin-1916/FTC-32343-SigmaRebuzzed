@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Util.PIDController;
+
+import java.util.Timer;
 
 public class Shooter {
 
@@ -18,6 +22,8 @@ public class Shooter {
     private PIDController shooterController;
 
     private double setpoint;
+    private double compressionSetpoint;
+    private double timestamp;
 
     public Shooter (HardwareMap hardwaremap) {
         shooterMotor = hardwaremap.get(DcMotorEx.class, Constants.shooterConstants.shooterMotorID);
@@ -40,6 +46,10 @@ public class Shooter {
     public double getPower() {
         return shooterMotor.getPower();
     }
+    public double getVelocity()  {
+        return shooterMotor.getVelocity();
+    }
+
 
     public double getRPM() {
         return (shooterMotor.getVelocity() / 24) * 60;
@@ -47,7 +57,7 @@ public class Shooter {
 
     public void runShooter() {
         shooterMotor.setPower(
-                Math.max(Math.min(shooterController.calculate(getRPM(), setpoint) +
+                Math.max(Math.min(shooterController.calculate(getVelocity(), (setpoint / 60) * 24) +
                         calculateFF(Constants.shooterConstants.shooterkS, Constants.shooterConstants.shooterkV),
                         Constants.shooterConstants.maxSpeed), 0));
 
@@ -61,24 +71,22 @@ public class Shooter {
         setpoint = newSetpoint;
     }
 
-//    public double getHoodPosition() {
-//        return hood.getPosition();
-//    }
-//
-//    public void setHoodPositonUp() {
-//        hood.setPosition(0.0);
-//    }
-//
-//    public void setHoodPositonDown() {
-//        hood.setPosition(0.4);
-//    }
-
     public double getCompression() {
         return compression.getPosition();
     }
 
     public void setCompression(double newCompression) {
-        compression.setPosition(newCompression);
+        compressionSetpoint = newCompression;
+        timestamp = System.currentTimeMillis();
     }
 
+    public void periodic() {
+        compression.setPosition(compressionSetpoint);
+        if (Math.abs(compressionSetpoint - getCompression()) < 0.05) {
+            timestamp = System.currentTimeMillis();
+        }
+        if (System.currentTimeMillis() > timestamp + 1000) {
+            setCompression(getCompression());
+        }
+    }
 }
