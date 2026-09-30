@@ -50,7 +50,6 @@ public class Shooter {
         return shooterMotor.getVelocity();
     }
 
-//1
     public double getRPM() {
         return (shooterMotor.getVelocity() / 24) * 60;
     }

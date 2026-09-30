@@ -10,6 +10,12 @@ public class Constants {
         public static final String backRightMotorID = "br";
     }
 
+    public static final class odometryConstants {
+        public static final String pinpointID = "pinpoint";
+        public static final double xOffset = 5.617;
+        public static final double yOffset = -5.786;
+    }
+
     public static final class shooterConstants {
         public static final String shooterMotorID = "shooter";
         public static final String compressionServoID = "compression";

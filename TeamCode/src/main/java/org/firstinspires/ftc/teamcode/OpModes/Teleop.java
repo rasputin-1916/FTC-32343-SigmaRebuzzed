@@ -3,19 +3,24 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
 
 @TeleOp(name="Drive", group="Teleop")
 public class Teleop extends LinearOpMode {
 
     Drivetrain s_Drive;
+    Odometry s_Odometry;
 //    Shooter s_Shooter;
 
     GamepadEx driver;
@@ -24,6 +29,7 @@ public class Teleop extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         s_Drive = new Drivetrain(hardwareMap);
+        s_Odometry = new Odometry(hardwareMap);
 
 //        s_Shooter = new Shooter(hardwareMap);
 
@@ -37,6 +43,8 @@ public class Teleop extends LinearOpMode {
       while (opModeIsActive()) {
 //          s_Shooter.setSetpoint(testRPM);
 //          s_Shooter.runShooter();
+
+          s_Odometry.periodic();
 
           s_Drive.drive(
                   driver.getLeftY(),
@@ -73,6 +81,9 @@ public class Teleop extends LinearOpMode {
 //          telemetry.addData("Shooter Setpoint", testRPM);
 //          telemetry.addData("Compression Setpoint", s_Shooter.getCompression());
           telemetry.addData("Drive Rotation", s_Drive.getHeading());
+          telemetry.addData("Odometry X:", s_Odometry.getPose().getX(DistanceUnit.INCH));
+          telemetry.addData("Odometry Y:", s_Odometry.getPose().getY(DistanceUnit.INCH));
+          telemetry.addData("Odometry Angle:", s_Odometry.getPose().getHeading(AngleUnit.DEGREES));
 
           telemetry.update();
       }
