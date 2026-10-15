@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
+
 public class Constants {
 
     public static final class driveConstants {
@@ -48,4 +50,5 @@ public class Constants {
         public static double shooterkS = 0.002;
         public static double shooterkV = 0.00019;
     }
+
 }
