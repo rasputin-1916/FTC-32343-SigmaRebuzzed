@@ -7,8 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.Commands.AutoForwardCommand;
+import org.firstinspires.ftc.teamcode.Commands.AutoCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
@@ -22,7 +21,7 @@ public class AutoTest extends LinearOpMode {
     Drivetrain s_Drive;
     Odometry s_Odometry;
 
-    AutoForwardCommand autoForward;
+    AutoCommand autoCommand;
 
     @Override
     public void runOpMode() {
@@ -36,11 +35,11 @@ public class AutoTest extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            autoForward = new AutoForwardCommand(s_Drive, s_Odometry);
+            autoCommand = new AutoCommand(s_Drive, s_Odometry);
 
             SparkFunOTOS.Pose2D target = new SparkFunOTOS.Pose2D(s_Odometry.getX(),s_Odometry.getY() + 40,90);
 
-            autoForward.run(target, 0.01,0.01);
+            autoCommand.run(target, 0.01,0.01);
 
             telemetry.addData("X Position: ", s_Odometry.getPosition().getX(DistanceUnit.INCH));
             telemetry.addData("Y Position: ", s_Odometry.getPosition().getY(DistanceUnit.INCH));

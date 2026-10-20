@@ -51,4 +51,8 @@ public class Constants {
         public static double shooterkV = 0.00019;
     }
 
+    public static final class intakeConstants {
+        public static final String intakeMotorID = "intake";
+    }
+
 }

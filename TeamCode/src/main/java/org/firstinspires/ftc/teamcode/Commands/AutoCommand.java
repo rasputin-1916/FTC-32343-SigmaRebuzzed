@@ -2,17 +2,14 @@ package org.firstinspires.ftc.teamcode.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
-import com.sun.tools.javac.code.Attribute;
 
-import org.firstinspires.ftc.robotcore.external.Const;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Odometry;
 import org.firstinspires.ftc.teamcode.Util.MathUtil;
 import org.firstinspires.ftc.teamcode.Util.PIDController;
 
-public class AutoForwardCommand extends CommandBase {
+public class AutoCommand extends CommandBase {
     Drivetrain s_Drivetrain;
     Odometry s_Odometry;
 
@@ -29,7 +26,7 @@ public class AutoForwardCommand extends CommandBase {
     boolean isFinished;
     double timestamp;
 
-    public AutoForwardCommand(Drivetrain drivetrain, Odometry odometry) {
+    public AutoCommand(Drivetrain drivetrain, Odometry odometry) {
         this.s_Drivetrain = drivetrain;
         this.s_Odometry = odometry;
 
