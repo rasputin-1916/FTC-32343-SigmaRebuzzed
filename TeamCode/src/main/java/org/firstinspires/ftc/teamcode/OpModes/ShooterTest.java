@@ -23,8 +23,8 @@ public class ShooterTest extends LinearOpMode {
 
       driver = new GamepadEx(gamepad1);
 
-      double testRPM = 500;
-      double servopos = 0;
+      double testRPM = 0;
+      s_Shooter.setCompression(Constants.shooterConstants.compressionMin);
 
       waitForStart();
 
@@ -38,12 +38,12 @@ public class ShooterTest extends LinearOpMode {
 
 
           if (driver.wasJustPressed(GamepadKeys.Button.A)) {
-//              s_Shooter.setCompression(s_Shooter.getCompression() - 0.05);
+//              s_Shooter.setCompression(s_Shooter.getCompression() - 0.01);
               s_Shooter.setCompression(Constants.shooterConstants.compressionMin);
           }
 
           if (driver.wasJustPressed(GamepadKeys.Button.B)) {
-//              s_Shooter.setCompression(s_Shooter.getCompression() + 0.05);
+//              s_Shooter.setCompression(s_Shooter.getCompression() + 0.01);
               s_Shooter.setCompression(Constants.shooterConstants.compressionMax);
           }
 
@@ -59,7 +59,7 @@ public class ShooterTest extends LinearOpMode {
 
           telemetry.addData("Shooter RPM", s_Shooter.getRPM());
           telemetry.addData("Shooter Setpoint", testRPM);
-          telemetry.addData("Compression Setpoint", s_Shooter.getCompression());
+          telemetry.addData("Compression Position", s_Shooter.getCompression());
 
           telemetry.update();
       }

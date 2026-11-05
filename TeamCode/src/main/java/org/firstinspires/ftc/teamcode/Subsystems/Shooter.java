@@ -33,11 +33,15 @@ public class Shooter {
 
 //        hood = hardwaremap.get(Servo.class, Constants.shooterConstants.hoodServoID);
         compression = hardwaremap.get(Servo.class, Constants.shooterConstants.compressionServoID);
+        compression.setDirection(Servo.Direction.FORWARD);
+        compression.scaleRange(Constants.shooterConstants.compressionMax, Constants.shooterConstants.compressionMin);
 
         shooterController = new PIDController(
                 Constants.shooterConstants.shooterkP,
                 Constants.shooterConstants.shooterkI,
                 Constants.shooterConstants.shooterkD);
+
+        compression.setPosition(0);
     }
 
     public void setPower(double desiredPower) {
@@ -51,12 +55,12 @@ public class Shooter {
     }
 
     public double getRPM() {
-        return (shooterMotor.getVelocity() / 24) * 60;
+        return (shooterMotor.getVelocity() / 28) * 60;
     }
 
     public void runShooter() {
         shooterMotor.setPower(
-                Math.max(Math.min(shooterController.calculate(getVelocity(), (setpoint / 60) * 24) +
+                Math.max(Math.min(shooterController.calculate(getVelocity(), (setpoint / 60) * 28) +
                         calculateFF(Constants.shooterConstants.shooterkS, Constants.shooterConstants.shooterkV),
                         Constants.shooterConstants.maxSpeed), 0));
 

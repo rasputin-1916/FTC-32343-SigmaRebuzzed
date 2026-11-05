@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class Odometry {
@@ -41,6 +42,10 @@ public class Odometry {
 
     public void resetPosition() {
         pinpoint.setPosition(new Pose2D(DistanceUnit.INCH,0,0, AngleUnit.DEGREES, 0));
+    }
+
+    public void setPosition(Pose2D newPos) {
+        pinpoint.setPosition(newPos);
     }
 
     public void periodic() {
