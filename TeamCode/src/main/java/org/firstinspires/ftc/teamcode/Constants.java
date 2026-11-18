@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.geometry.Translation2d;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
 public class Constants {
 
     public static final class driveConstants {
@@ -23,9 +29,9 @@ public class Constants {
     public static final class odometryConstants {
         public static final String pinpointID = "pinpoint";
         public static final double trackwidth = 11 + (3.0/8.0);
-        public static final double xOffset = 5.618110;
+        public static final double xOffset = -5.629;
         //5.618110
-        public static final double yOffset = -5.779771;
+        public static final double yOffset = -5.783;
         //-5.779771
         public static final double ticksPerRev = 2000.0;
         public static final double wheelDiameter = 1.88976;
@@ -44,23 +50,26 @@ public class Constants {
 
         //in motor rotations
         public static final double minMotorPos = 0.00;
-        public static final double maxMotorPos = 2.15;
+        public static final double maxMotorPos = 2.20;
         public static final double minServoPos = 0.40;
         public static final double maxServoPos = 1.80;
 
         public static final double motorkP = 1.5;
-        public static final double motorkI = 0.0;
+        public static final double motorkI = 0.05;
         public static final double motorkD = 0.02;
         public static final double motorTolerance = 0.05;
 
         public static final double motorkS = 0.0;
         public static final double motorkV = 0.0;
-        public static final double motorkG = 0.0;
+        public static final double motorkG = 0.1;
 
         public static final double servokP = 1.0;
         public static final double servokI = 0.0;
         public static final double servokD = 0.0;
         public static final double servoTolerance = 0.05;
+
+        public static final double pollenSize = 0.20;
+        public static final double nectarSize = 0.25;
     }
 
     public static final class shooterConstants {
@@ -68,24 +77,33 @@ public class Constants {
         public static final String compressionServoID = "compression";
         public static final String hoodServoID = "hood";
 
-        public static final double compressionMax = 0.26;
+        public static final double compressionMax = 0.24;
         public static final double compressionMin = 0.46;
 
         public static double maxSpeed = 1.0;
-        public static double shooterkP = 0.0001;
-        public static double shooterkI = 0.0;
-        public static double shooterkD = 0.0;
+
         public static double shooterkS = 0.002;
         public static double shooterkV = 0.00019;
+
+        @Config
+        public static class shooterConfigs {
+            public static double shooterkP = 0.0002;
+            public static double shooterkI = 0.0001;
+            public static double shooterkD = 0.00002;
+        }
     }
 
     public static final class turretConstants {
         public static final String turretID = "turret";
-        public static final double turretkP = 0.015;
-        public static final double turretkI = 0.015;
-        public static final double turretkD = 0.0004;
         public static final double turretTolerance = 0.5;
         public static final double turretMaxSpeed = 1.0;
+
+        @Config
+        public static class turretConfigs {
+            public static double turretkP = 0.02;
+            public static double turretkI = 0.0005;
+            public static double turretkD = 0.00045;
+        }
     }
 
     public static final class clampConstants {
@@ -95,6 +113,14 @@ public class Constants {
         public static final double openFrontPosition = 0.75;
         public static final double closedBackPosition = 0.65;
         public static final double openBackPosition = 1.0;
+    }
+
+    public static final class targetingConstants {
+        public static final Translation2d positiveYBlueGoal = new Translation2d(18.0, 18.0);
+        public static final Translation2d negativeYBlueGoal = new Translation2d(18.0, -18.0);
+        public static final Translation2d positiveYRedGoal = new Translation2d(-18.0, 18.0);
+        public static final Translation2d negativeYRedGoal = new Translation2d(-18.0, -18.0);
+
     }
 
 }

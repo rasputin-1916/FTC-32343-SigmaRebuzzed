@@ -21,6 +21,7 @@ public class Transfer {
     private AnalogInput servoPosition;
     private double motorSetpoint, servoSetpoint;
     private double lastServoPosition, storedRotations;
+    private double variablekG;
 
     public Transfer(HardwareMap hardwareMap) {
         firstStage = hardwareMap.get(DcMotorEx.class, Constants.transferConstants.transferMotorID);
@@ -46,6 +47,7 @@ public class Transfer {
                 Constants.transferConstants.servokD
         );
 
+        variablekG = 0.1;
         storedRotations = 0;
         lastServoPosition = servoPosition.getVoltage() / 3.3;
     }
@@ -58,7 +60,7 @@ public class Transfer {
         double output = firstStageController.calculate(getMotorPosition(), newSetpoint)
                 + calculateFF(Constants.transferConstants.motorkS,
                 Constants.transferConstants.motorkV,
-                Constants.transferConstants.motorkG,
+                variablekG,
                 Math.abs(newSetpoint - getMotorPosition()));
 
         if (!(Math.abs(newSetpoint - getMotorPosition()) < Constants.transferConstants.motorTolerance)) {
@@ -135,6 +137,8 @@ public class Transfer {
     }
 
     public void periodic() {
+
+        variablekG = 0.1 * motorSetpoint;
 
         double servoError = (servoPosition.getVoltage() / 3.3) - lastServoPosition;
 

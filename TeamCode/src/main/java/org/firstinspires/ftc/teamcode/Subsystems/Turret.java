@@ -21,9 +21,9 @@ public class Turret {
         turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         turretController = new PIDController(
-                Constants.turretConstants.turretkP,
-                Constants.turretConstants.turretkI,
-                Constants.turretConstants.turretkD
+                Constants.turretConstants.turretConfigs.turretkP,
+                Constants.turretConstants.turretConfigs.turretkI,
+                Constants.turretConstants.turretConfigs.turretkD
         );
         turretController.enableContinuousInput(-180, 180);
 

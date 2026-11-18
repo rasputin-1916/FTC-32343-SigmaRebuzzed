@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.Constants;
 
 public class Odometry {
@@ -18,7 +17,7 @@ public class Odometry {
 
         pinpoint.setOffsets(Constants.odometryConstants.xOffset, Constants.odometryConstants.yOffset, DistanceUnit.INCH); //these are tuned for 3110-0002-0001 Product Insight #1
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         pinpoint.resetPosAndIMU();
 
         pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0));
@@ -29,11 +28,11 @@ public class Odometry {
     }
 
     public double getX() {
-        return -(getPosition().getX(DistanceUnit.INCH));
+        return (getPosition().getX(DistanceUnit.INCH));
     }
 
     public double getY() {
-        return -(getPosition().getY(DistanceUnit.INCH));
+        return (getPosition().getY(DistanceUnit.INCH));
     }
 
     public double getRotation() {
@@ -44,7 +43,7 @@ public class Odometry {
         pinpoint.setPosition(new Pose2D(DistanceUnit.INCH,0,0, AngleUnit.DEGREES, 0));
     }
 
-    public void setPosition(Pose2D newPos) {
+    public void setNewPosition(Pose2D newPos) {
         pinpoint.setPosition(newPos);
     }
 

@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.Commands.CalculateShot;
+import org.firstinspires.ftc.teamcode.Commands.GamePieceQueue;
 import org.firstinspires.ftc.teamcode.Commands.IncrementLift;
 import org.firstinspires.ftc.teamcode.Constants;
 import org.firstinspires.ftc.teamcode.Subsystems.ClampServos;
@@ -21,6 +23,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.Subsystems.Transfer;
 import org.firstinspires.ftc.teamcode.Subsystems.Turret;
 import org.firstinspires.ftc.teamcode.Util.MathUtil;
+
+import java.util.ArrayList;
 
 @TeleOp(name="Teleop", group="Teleop")
 public class Teleop extends LinearOpMode {
@@ -38,9 +42,21 @@ public class Teleop extends LinearOpMode {
 
     MultipleTelemetry m_Telemetry;
     IncrementLift m_Lift;
+    CalculateShot m_Aim;
+    GamePieceQueue m_Queue;
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+        driver = new GamepadEx(gamepad1);
+        operator = new GamepadEx(gamepad2);
+
+        double shooterRPM = 500;
+        double transferPosition = 0.0;
+        double queueTimestamp = getRuntime();
+        double transferDistance = 0.0;
+//        double turretPosition = 0.0;
+//        boolean isNectar = false;
 
         s_Drive = new Drivetrain(hardwareMap);
         s_Odometry = new Odometry(hardwareMap);
@@ -52,22 +68,24 @@ public class Teleop extends LinearOpMode {
 
         m_Telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         m_Lift = new IncrementLift(s_Transfer);
-
-        double shooterRPM = 500;
-        double transferPosition = 0.0;
-        double turretPosition = 0.0;
-
-      driver = new GamepadEx(gamepad1);
-      operator = new GamepadEx(gamepad2);
+        m_Aim = new CalculateShot(
+                s_Shooter,
+                s_Turret,
+                s_Odometry,
+                false,
+                () -> s_Shooter.getCompression() < 0.5,
+                () -> s_Shooter.getCompression() > 0.5);
+        m_Queue = new GamePieceQueue(m_Lift, s_Transfer, s_Shooter, operator);
 
       s_Clamp.setFrontCornerServo(Constants.clampConstants.closedFrontPosition);
       s_Clamp.setBackCornerServo(Constants.clampConstants.closedBackPosition);
 
-      s_Odometry.setPosition(new Pose2D(DistanceUnit.INCH, 8.0, 8.0, AngleUnit.DEGREES, 0));
 
       waitForStart();
 
-      while (opModeIsActive()) {
+      s_Odometry.setNewPosition(new Pose2D(DistanceUnit.INCH, 62.0, -60.0, AngleUnit.DEGREES, 0));
+
+        while (opModeIsActive()) {
 
           driver.readButtons();
           operator.readButtons();
@@ -82,23 +100,53 @@ public class Teleop extends LinearOpMode {
                   driver.getRightX()
           );
 
-          if (driver.wasJustPressed(GamepadKeys.Button.A)) {
-              s_Shooter.setCompression(0);
+          if (operator.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+              m_Queue.addPollen();
           }
 
-          if (driver.wasJustPressed(GamepadKeys.Button.B)) {
-              s_Shooter.setCompression(1);
+          if (operator.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+              m_Queue.addNectar();
           }
 
-          if (driver.wasJustPressed(GamepadKeys.Button.X)) {
-              shooterRPM += 50;
+          if (operator.wasJustPressed(GamepadKeys.Button.A)) {
+              m_Queue.clear();
           }
 
-          if (driver.wasJustPressed(GamepadKeys.Button.Y)) {
-              shooterRPM -= 25;
+            m_Queue.calculateDistances();
+
+          if (operator.wasJustPressed(GamepadKeys.Button.Y)) {
+//              if (m_Queue.calculateDistances().isPresent()) {
+                  ArrayList<Double> givenList = m_Queue.getDistanceList();
+                  for (int j = -1; j < givenList.size();) {
+                      m_Telemetry.addData("timestamp", queueTimestamp);
+                      m_Telemetry.addData("given list", givenList);
+                      m_Telemetry.addData("transfer distance", transferDistance);
+                      if (j == -1) {
+                          queueTimestamp = getRuntime();
+                          j++;
+                      }
+                      if (givenList.get(j) % Constants.transferConstants.nectarSize == 0) {
+                          s_Shooter.setCompression(1);
+                      } else {
+                          s_Shooter.setCompression(0);
+                      }
+                      transferDistance += givenList.get(j);
+                      transferDistance = MathUtil.clamp(transferDistance, 0, 1);
+                      m_Lift.run(transferDistance);
+                      if (getRuntime() > queueTimestamp + 0.5) {
+                          if (j == givenList.size() - 1) {
+                              m_Queue.clear();
+                              m_Lift.run(0);
+                          }
+                          queueTimestamp = getRuntime();
+                          j++;
+                      }
+                  }
+//              }
           }
 
-          s_Shooter.setSetpoint(shooterRPM);
+          m_Aim.run();
+
           s_Shooter.runShooter();
 
           if (driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1) {
@@ -112,26 +160,41 @@ public class Teleop extends LinearOpMode {
               s_Intake.setIntakeMotor(0);
           }
 
-          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-              transferPosition -= 0.125;
+//          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+//              transferPosition = 0;
+//          }
+//
+//          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+//              transferPosition += 0.125;
+//          }
+
+          // pollen 1st ball 0.41, 0.59, 0.76, 0.95,
+            // in 0.25 intervals
+//
+//          transferPosition = MathUtil.clamp(transferPosition, 0 , 1);
+//          m_Lift.run(transferPosition);
+
+//          if (driver.wasJustPressed(GamepadKeys.Button.A)) {
+//              s_Shooter.setCompression(0);
+//          }
+//
+//          if (driver.wasJustPressed(GamepadKeys.Button.B)) {
+//              s_Shooter.setCompression(1);
+//          }
+
+          if (driver.wasJustPressed(GamepadKeys.Button.BACK)) {
+              s_Odometry.setNewPosition(new Pose2D(DistanceUnit.INCH, 62.0, -60.0, AngleUnit.DEGREES, 0));
           }
 
-          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-              transferPosition += 0.125;
-          }
-
-          transferPosition = MathUtil.clamp(transferPosition, 0 , 1);
-          m_Lift.run(transferPosition);
-
-          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-              turretPosition += 5.0;
-          }
-
-          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
-              turretPosition -= 5.0;
-          }
-
-          s_Turret.setSetpoint(turretPosition);
+//          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+//              turretPosition += 5.0;
+//          }
+//
+//          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+//              turretPosition -= 5.0;
+//          }
+//
+//          s_Turret.setSetpoint(turretPosition);
 
 
           s_Shooter.periodic();
@@ -139,6 +202,9 @@ public class Teleop extends LinearOpMode {
           s_Transfer.periodic();
           s_Odometry.periodic();
           s_Drive.periodic();
+
+          m_Telemetry.addData("Boolean List", m_Queue.getBooleanlist());
+          m_Telemetry.addData("Distance List", m_Queue.getDistanceList());
 
           m_Telemetry.addData("Shooter Setpoint", shooterRPM);
           m_Telemetry.addData("Shooter RPM", s_Shooter.getRPM());
@@ -154,11 +220,12 @@ public class Teleop extends LinearOpMode {
 
 
           m_Telemetry.addData("Drive Rotation", s_Drive.getHeading());
-          m_Telemetry.addData("Odometry X:", s_Odometry.getPosition().getX(DistanceUnit.INCH));
-          m_Telemetry.addData("Odometry Y:", s_Odometry.getPosition().getY(DistanceUnit.INCH));
+          m_Telemetry.addData("Odometry X:", s_Odometry.getX());
+          m_Telemetry.addData("Odometry Y:", s_Odometry.getY());
           m_Telemetry.addData("Odometry Angle:", s_Odometry.getPosition().getHeading(AngleUnit.DEGREES));
 
           m_Telemetry.update();
+
       }
     }
 }

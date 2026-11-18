@@ -24,7 +24,7 @@ public class ShooterTest extends LinearOpMode {
       driver = new GamepadEx(gamepad1);
 
       double testRPM = 0;
-      s_Shooter.setCompression(Constants.shooterConstants.compressionMin);
+      s_Shooter.setCompression(s_Shooter.getCompression());
 
       waitForStart();
 
@@ -38,23 +38,34 @@ public class ShooterTest extends LinearOpMode {
 
 
           if (driver.wasJustPressed(GamepadKeys.Button.A)) {
-//              s_Shooter.setCompression(s_Shooter.getCompression() - 0.01);
-              s_Shooter.setCompression(Constants.shooterConstants.compressionMin);
+              s_Shooter.setCompression(s_Shooter.getCompression() - 0.01);
+//              s_Shooter.setCompression(0);
           }
 
           if (driver.wasJustPressed(GamepadKeys.Button.B)) {
-//              s_Shooter.setCompression(s_Shooter.getCompression() + 0.01);
-              s_Shooter.setCompression(Constants.shooterConstants.compressionMax);
+              s_Shooter.setCompression(s_Shooter.getCompression() + 0.01);
+//              s_Shooter.setCompression(1);
           }
 
+          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+              testRPM = 1750;
+          }
+
+          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+              testRPM = 2000;
+          }
+
+          if (driver.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+              testRPM = 2500;
+          }
 
 
           if (driver.wasJustPressed(GamepadKeys.Button.X)) {
-              testRPM += 50;
+              s_Shooter.setCompression(1);
           }
 
           if (driver.wasJustPressed(GamepadKeys.Button.Y)) {
-              testRPM -= 25;
+              s_Shooter.setCompression(0);
           }
 
           telemetry.addData("Shooter RPM", s_Shooter.getRPM());

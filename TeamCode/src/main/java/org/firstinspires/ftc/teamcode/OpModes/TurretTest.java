@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -24,9 +25,13 @@ public class TurretTest extends LinearOpMode {
         driver = new GamepadEx(gamepad1);
         operator = new GamepadEx(gamepad2);
 
+        double turretSetpoint = 0;
+
         waitForStart();
 
         while (opModeIsActive()) {
+
+            driver.readButtons();
 
             s_Drive.drive(
                     driver.getLeftY(),
@@ -34,7 +39,23 @@ public class TurretTest extends LinearOpMode {
                     driver.getRightX()
             );
 
-            s_Turret.setSetpoint(-Math.toDegrees(Math.atan2(operator.getLeftY(), operator.getLeftX())) + 90);
+            if (driver.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                turretSetpoint = 0;
+            }
+
+            if (driver.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                turretSetpoint = 90;
+            }
+
+            if (driver.wasJustPressed(GamepadKeys.Button.DPAD_LEFT)) {
+                turretSetpoint = -90;
+            }
+
+            if (driver.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
+                turretSetpoint = -120;
+            }
+
+            s_Turret.setSetpoint(turretSetpoint);
 
             s_Turret.periodic();
 

@@ -37,9 +37,9 @@ public class Shooter {
         compression.scaleRange(Constants.shooterConstants.compressionMax, Constants.shooterConstants.compressionMin);
 
         shooterController = new PIDController(
-                Constants.shooterConstants.shooterkP,
-                Constants.shooterConstants.shooterkI,
-                Constants.shooterConstants.shooterkD);
+                Constants.shooterConstants.shooterConfigs.shooterkP,
+                Constants.shooterConstants.shooterConfigs.shooterkI,
+                Constants.shooterConstants.shooterConfigs.shooterkD);
 
         compression.setPosition(0);
     }
